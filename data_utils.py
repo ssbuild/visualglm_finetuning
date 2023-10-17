@@ -18,16 +18,14 @@ from transformers import HfArgumentParser
 from data_processer import DataStrategy, TokenIdsMaker
 from aigc_zoo.model_zoo.visualglm.llm_model import ChatGLMTokenizer,PetlArguments,ChatGLMConfig,build_masks_and_position_ids_glm
 from config import *
+from deep_training.nlp.models.visualglm.visual import BlipImageEvalProcessor
+from PIL import Image
+from io import BytesIO
+
 
 data_conf = {
    'strategy': DataStrategy.truncation, # 数据策略选项
     DataStrategy.truncation: {
-    },
-    DataStrategy.sliding: {
-        'sliding_size': train_info_args['max_seq_length'] // 3 * 2, #prompt滑动窗口大小
-        'p':-1, # p < 0 , 随机选举prompt
-        "src_max_length": train_info_args['max_seq_length'] - 10,
-        "dst_max_length": None,
     },
 }
 
@@ -66,10 +64,8 @@ class NN_DataHelper(DataHelper):
         strategy = data_conf['strategy']
         if strategy == DataStrategy.truncation:
             ds = TokenIdsMaker.tunction(tokenizer,config,examples=examples, max_seq_length=max_seq_length, sptoken=self.sptoken ,**data_conf[strategy])
-        elif strategy == DataStrategy.sliding:
-            ds = TokenIdsMaker.slidding(tokenizer,config, examples=examples, max_seq_length=max_seq_length, sptoken=self.sptoken, **data_conf[strategy])
         else:
-            raise ValueError('Invlid strategy',strategy)
+            raise ValueError('Invalid strategy',strategy)
 
         if not ds:
             return None
@@ -152,11 +148,24 @@ class NN_DataHelper(DataHelper):
 
 
     def collate_fn(self,batch):
+        batch = copy.copy(batch)
         if not hasattr(self,'sptoken'):
             self.sptoken = self.tokenizer.encode(text="")[-2:]
 
         o = {}
         for i, b in enumerate(batch):
+            image_path = b.pop("image_path")
+            image_path = image_path[0]
+            if isinstance(image_path,bytes):
+                image_path = str(image_path, encoding='utf-8')
+            if image_path:
+                image = Image.open(image_path)
+                processor = BlipImageEvalProcessor(224)
+                image = processor(image.convert('RGB'))
+                b["images"] = image
+            else:
+                b["pre_image_length"] = torch.zeros(1)
+
             if i == 0:
                 for k in b:
                     o[k] = [torch.tensor(b[k])]
@@ -171,11 +180,12 @@ class NN_DataHelper(DataHelper):
         input_ids = o['input_ids'][:, :max_len]
         ctxlens = o.pop('ctxlen')
         assert ctxlens is not None
-        attention_mask,position_ids = build_masks_and_position_ids_glm(input_ids,ctxlens,max_len)
+        # attention_mask,position_ids = build_masks_and_position_ids_glm(input_ids,ctxlens,max_len)
         o['input_ids'] = input_ids.long()
-        o['attention_mask'] = attention_mask.bool()
-        o['position_ids'] = position_ids.long()
+        # o['attention_mask'] = attention_mask.bool()
+        # o['position_ids'] = position_ids.long()
         o['labels'] = o['labels'][:, :max_len].long()
+        o["pre_image_length"] = torch.max(o["pre_image_length"])
         return o
 
     def make_dataset_all(self):
@@ -188,6 +198,8 @@ class NN_DataHelper(DataHelper):
             "labels": "int32_list",
             "seqlen": "int32_list",
             "ctxlen": "int32_list",
+            "image_path": "binary_list",
+            "pre_image_length": "int32",
         }
         # 缓存数据集
         if data_args.do_train:

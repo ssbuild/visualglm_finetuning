@@ -1,4 +1,5 @@
 cpm_kernels
+SwissArmyTransformer>=0.4.4
 transformers>=4.30
 deepspeed
 bitsandbytes>=0.39
