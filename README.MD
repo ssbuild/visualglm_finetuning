@@ -1,8 +1,8 @@
-# 当前状态，测试中...
 ##  statement
 - [deep_training](https://github.com/ssbuild/deep_training)
 
 ```text
+    2023-10-18 微调推理测试初步完成
     2023-10-17 initial visualglm_finetuning
 ```
    
