@@ -136,5 +136,5 @@ a answer   must
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ssbuild/visualglm_finetuning&type=Date)](https://star-history.com/#ssbuild/visual_finetuning&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ssbuild/visualglm_finetuning&type=Date)](https://star-history.com/#ssbuild/visualglm_finetuning&Date)
 
