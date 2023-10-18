@@ -168,10 +168,12 @@ class NN_DataHelper(DataHelper):
 
             if i == 0:
                 for k in b:
-                    o[k] = [torch.tensor(b[k])]
+                    value = b[k] if isinstance(b[k], torch.Tensor) else torch.tensor(b[k])
+                    o[k] = [value]
             else:
                 for k in b:
-                    o[k].append(torch.tensor(b[k]))
+                    value = b[k] if isinstance(b[k], torch.Tensor) else torch.tensor(b[k])
+                    o[k].append(value)
         for k in o:
             o[k] = torch.stack(o[k])
 
