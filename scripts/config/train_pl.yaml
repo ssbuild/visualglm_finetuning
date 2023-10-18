@@ -58,7 +58,7 @@ max_steps: -1
 # 'scheduler_type': 'CAL',
 # 'scheduler': {'rewarm_epoch_num': 2,'verbose': True},
 
-optimizer: lion
+optimizer: adamw_torch
 scheduler_type: CAWR
 scheduler:
   T_mult: 1
