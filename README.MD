@@ -31,20 +31,7 @@ a answer   must
 
 ```
 ```json
-{
-    "id": 0, 
-    "p": null,
-    "paragraph": [
-        {
-           "q": "你好",
-           "a": "我是Qwen-VL,一个支持视觉输入的大模型。"
-        },
-         {
-             "q": "<img>../assets/demo.jpeg</img>\n图中的狗是什么品种？",
-             "a":  "图中是一只拉布拉多犬。"
-         }
-     ]
-}
+{"id": 1, "paragraph": [{"q": "<img>../assets/demo.jpeg</img>\n图中的狗是什么品种？", "a": "图中是一只拉布拉多犬。"}]}
 ```
 或者 
 
@@ -52,14 +39,6 @@ a answer   must
 {
     "id": 0,
     "conversations": [
-      {
-        "from": "user",
-        "value": "你好"
-      },
-      {
-        "from": "assistant",
-        "value": "我是Qwen-VL,一个支持视觉输入的大模型。"
-      },
       {
         "from": "user",
         "value": "<img>../assets/demo.jpeg</img>\n图中的狗是什么品种？"

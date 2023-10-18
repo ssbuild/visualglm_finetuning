@@ -56,15 +56,15 @@ if __name__ == '__main__':
     lora_model: PetlModel = pl_model.backbone
 
     text_list = [
-        "写一个诗歌，关于冬天",
-        "晚上睡不着应该怎么办",
+        ("图中的狗是什么品种？", "../assets/demo.jpeg"),
+        ("这张图片的背景里有什么内容？", "../assets/ghost.jpg"),
     ]
 
     # 基准模型推理
     with lora_model.disable_adapter():
-        for input in text_list:
+        for (input,image_path) in text_list:
             #lora_model 调用子对象方法
-            response, history = lora_model.chat(tokenizer, input, history=[], max_length=2048,
+            response, history = lora_model.chat(tokenizer,image_path, input, history=[], max_length=2048,
                                            eos_token_id=config.eos_token_id,
                                            do_sample=True, top_p=0.7, temperature=0.95, )
             print("input", input)
@@ -72,9 +72,9 @@ if __name__ == '__main__':
 
     lora_model.set_adapter(adapter_name='default')
 
-    for input in text_list:
+    for  (input,image_path) in text_list:
         # lora_model 调用子对象方法
-        response, history = lora_model.chat(tokenizer, input, history=[], max_length=2048,
+        response, history = lora_model.chat(tokenizer,image_path, input, history=[], max_length=2048,
                                             eos_token_id=config.eos_token_id,
                                             do_sample=True, top_p=0.7, temperature=0.95, )
         print("input", input)

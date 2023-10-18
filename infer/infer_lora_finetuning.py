@@ -54,11 +54,11 @@ if __name__ == '__main__':
         model = pl_model.get_llm_model()
 
         text_list = [
-            "写一个诗歌，关于冬天",
-            "晚上睡不着应该怎么办",
+            ("图中的狗是什么品种？", "../assets/demo.jpeg"),
+            ("这张图片的背景里有什么内容？", "../assets/ghost.jpg"),
         ]
-        for input in text_list:
-            response, history = model.chat(tokenizer, input, history=[], max_length=2048,
+        for (input, image_path) in text_list:
+            response, history = model.chat(tokenizer,image_path, input, history=[], max_length=2048,
                                            eos_token_id=config.eos_token_id,
                                            do_sample=True, top_p=0.7, temperature=0.95, )
             print("input", input)

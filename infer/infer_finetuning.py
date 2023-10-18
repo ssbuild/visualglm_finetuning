@@ -30,16 +30,16 @@ if __name__ == '__main__':
 
     ###################### 注意 选最新权重
     #选择最新的权重 ， 根据时间排序 选最新的
-    config = ChatGLMConfig.from_pretrained('./best_ckpt')
+    config = ChatGLMConfig.from_pretrained('../scripts/best_ckpt')
     config.initializer_weight = False
     pl_model = MyTransformer(config=config, model_args=model_args, torch_dtype=torch.float16,)
     if deep_config is None:
-        train_weight = './best_ckpt/last-v3.ckpt'
+        train_weight = '../scripts/best_ckpt/last-v3.ckpt'
     else:
         #使用转换脚本命令 生成 ./best_ckpt/last/best.pt 权重文件
         # cd best_ckpt/last
         # python zero_to_fp32.py . best.pt
-        train_weight = './best_ckpt/last/best.pt'
+        train_weight = '../scripts/best_ckpt/last/best.pt'
 
     #加载微调权重
     pl_model.load_sft_weight(train_weight,strict=False)
@@ -65,11 +65,11 @@ if __name__ == '__main__':
     model = model.eval()
 
     text_list = [
-        "写一个诗歌，关于冬天",
-        "晚上睡不着应该怎么办",
+        ("图中的狗是什么品种？", "../assets/demo.jpeg"),
+        ("这张图片的背景里有什么内容？", "../assets/ghost.jpg"),
     ]
-    for input in text_list:
-        response, history = model.chat(tokenizer, input, history=[],max_length=2048,
+    for (input, image_path) in text_list:
+        response, history = model.chat(tokenizer,image_path, input, history=[],max_length=2048,
                                             eos_token_id=config.eos_token_id,
                                             do_sample=True, top_p=0.7, temperature=0.95,)
         print("input",input)

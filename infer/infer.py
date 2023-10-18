@@ -26,8 +26,10 @@ if __name__ == '__main__':
     assert tokenizer.eos_token_id == 130005
     config.initializer_weight = False
 
-
-    rope_args = RotaryNtkScaledArguments(model_type='chatglm',max_position_embeddings=config.max_sequence_length,alpha=4) # 扩展 8k
+    rope_args = None
+    enable_rope = False
+    if enable_rope:
+        rope_args = RotaryNtkScaledArguments(model_type='chatglm',max_position_embeddings=config.max_sequence_length,alpha=4) # 扩展 8k
     # rope_args = RotaryLinearScaledArguments(model_type='chatglm',name='rotary_pos_emb',max_position_embeddings=2048, scale=4) # 扩展 8k
     
     pl_model = MyTransformer(config=config, model_args=model_args, torch_dtype=torch.float16,rope_args=rope_args)
@@ -42,16 +44,16 @@ if __name__ == '__main__':
     model = model.eval()
 
     text_list = [
-        "写一个诗歌，关于冬天",
-        "晚上睡不着应该怎么办",
+         ( "图中的狗是什么品种？","../assets/demo.jpeg"),
+         ( "这张图片的背景里有什么内容？","../assets/ghost.jpg"),
     ]
-    for input in text_list:
-        response, history = model.chat(tokenizer, input, history=[], max_length=2048,
+    for (input,image_path) in text_list:
+        response, history = model.chat(tokenizer,image_path, input, history=[], max_length=2048,
                                        eos_token_id=config.eos_token_id,
                                        do_sample=True, top_p=0.7, temperature=0.95, )
         print("input", input)
         print("response", response)
 
-    # response, history = base_model.chat(tokenizer, "写一个诗歌，关于冬天", history=[],max_length=30)
-    # print('写一个诗歌，关于冬天',' ',response)
+    # response, history = base_model.chat(tokenizer, "图中的狗是什么品种？", history=[],max_length=30)
+    # print('图中的狗是什么品种？',' ',response)
 
