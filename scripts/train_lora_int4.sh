@@ -8,9 +8,8 @@ train_config="./config/train_${trainer_backend}.yaml"
 export train_config=${train_config}
 export enable_deepspeed=false
 export enable_ptv2=false
-export enable_lora=false
-export load_in_bit=0
-
+export enable_lora=true
+export load_in_bit=4
 
 # export CUDA_VISIBLE_DEVICES=1,2,3,4
 
